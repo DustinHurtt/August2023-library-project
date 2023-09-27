@@ -62,4 +62,63 @@ router.post('/create', (req, res, next) => {
 
 })
 
+router.get('/edit/:bookId', (req, res, next) => {
+
+    let { bookId } = req.params
+
+    Book.findById(bookId)
+        .then((foundBook) => {
+            console.log("These is the book from the DB", foundBook)
+            res.render('books/book-edit.hbs', foundBook )
+        })
+        .catch((err) => {
+            console.log(err)
+            next(err)
+        })
+
+})
+
+router.post('/edit/:bookId', (req, res, next) => {
+
+    let { bookId } = req.params
+
+    let { title, description, author, rating } = req.body
+
+    Book.findByIdAndUpdate(
+        bookId,
+        {
+            title,
+            description,
+            author,
+            rating,
+        },
+        { new: true }
+    )
+    .then((updatedBook) => {
+        console.log("Book after update ===>", updatedBook)
+        res.redirect(`/books/book-details/${updatedBook._id}`)
+    })
+    .catch((err) => {
+        console.log(err)
+        next(err)
+    })
+
+})
+
+router.post('/delete/:bookId', (req, res, next) => {
+    
+    let { bookId } = req.params
+
+    Book.findByIdAndRemove(bookId)
+        .then((result) => {
+            console.log("Deletion result ===>", result)
+            res.redirect('/books')
+        })
+        .catch((err) => {
+            console.log(err)
+            next(err)
+        })
+
+})
+
 module.exports = router;
